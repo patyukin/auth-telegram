@@ -1,0 +1,40 @@
+### Send POST request with json body
+POST http://localhost:1234/sign-up
+Content-Type: application/json
+
+{
+  "login": "user",
+  "password": "password",
+  "telegram": "patyukin"
+}
+
+
+### Resend code POST request with json body
+POST http://localhost:1234/resend-code
+Content-Type: application/json
+
+{
+  "login": "user",
+  "password": "password",
+  "telegram": "patyukin"
+}
+
+
+### login
+POST http://localhost:1234/sign-in
+Content-Type: application/json
+
+{
+  "login": "user",
+  "password": "password"
+}
+
+
+### login - verify
+POST http://localhost:1234/sign-in-verify
+Content-Type: application/json
+
+{
+  "code": "858cb626d00cc3cf1d9a27129c3c7a5bddd75805cbef4f7db69dbd52d461"
+}
+

@@ -1,0 +1,5 @@
+/.idea/
+go_build_*
+/.env
+/.env.local
+/bin/*
