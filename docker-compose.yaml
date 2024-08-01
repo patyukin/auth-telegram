@@ -1,34 +1,18 @@
 services:
-#  app:
-#    build:
-#      dockerfile: local.Dockerfile
-#    restart: always
-#    volumes:
-#      - .:/app
-#    ports:
-#      - "1233:1234"
-#    depends_on:
-#      - redis
-#      - db
-
-  db:
-    image: postgres:16.0
+  app:
+    build:
+      dockerfile: prod.Dockerfile
+    restart: always
     ports:
-      - 5430:5432
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: auth
-    volumes:
-      - data_postgresql:/var/lib/postgresql/data
+      - "1212:1234"
+    networks:
+      - pg
+      - redis
 
+networks:
+  pg:
+    name: pg
+    external: true
   redis:
-    image: redis:7.0
-    ports:
-      - 6380:6379
-    volumes:
-      - data_redis:/data
-
-volumes:
-  data_postgresql:
-  data_redis:
+    name: redis
+    external: true
