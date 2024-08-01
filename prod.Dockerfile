@@ -13,4 +13,4 @@ COPY --from=builder /app/bin/auth .
 COPY config.yaml config.yaml
 ENV CONFIG_FILE_PATH=config.yaml
 
-CMD ["./sender"]
+CMD ["./auth"]
