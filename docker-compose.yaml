@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      dockerfile: prod.Dockerfile
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "1212:1234"
