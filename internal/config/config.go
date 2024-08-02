@@ -30,6 +30,8 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
+	envType := os.Getenv("ENV_TYPE")
+
 	yamlConfigFilePath := os.Getenv("YAML_CONFIG_FILE_PATH")
 	if yamlConfigFilePath == "" {
 		return nil, fmt.Errorf("config file path is not set")
@@ -52,9 +54,11 @@ func LoadConfig() (*Config, error) {
 		return nil, fmt.Errorf("unable to decode config file: %w", err)
 	}
 
-	envConfigFilePath := os.Getenv("ENV_CONFIG_FILE_PATH")
-	if err = godotenv.Load(envConfigFilePath); err != nil {
-		log.Fatal("Error loading .env file")
+	if envType == "devel" {
+		envConfigFilePath := os.Getenv("ENV_CONFIG_FILE_PATH")
+		if err = godotenv.Load(envConfigFilePath); err != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
 
 	// postgresql
