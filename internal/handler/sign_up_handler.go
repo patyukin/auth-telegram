@@ -31,7 +31,7 @@ func (h *Handler) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	link := fmt.Sprintf("https://t.me/%s?start=%s", dto.BotName, dto.Code)
-	message := fmt.Sprintf("Please start the bot by sending /start to complete your registration: %s", link)
+	message := fmt.Sprintf("1 HOUR left. Please start the bot by sending /start to complete your registration: %s", link)
 
 	response := struct {
 		Message string `json:"message"`

@@ -36,7 +36,7 @@ func (uc *UseCase) SignUp(ctx context.Context, in model.SignUpData) (dto.SignUpR
 			return fmt.Errorf("failed to create user: %w", err)
 		}
 
-		err = uc.redis.SetSignUpCode(ctx, in.Telegram, code, userUUID, time.Minute)
+		err = uc.redis.SetSignUpCode(ctx, in.Telegram, code, userUUID, time.Hour)
 		if err != nil {
 			return fmt.Errorf("failed to register user: %w", err)
 		}
