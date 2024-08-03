@@ -8,33 +8,33 @@ import (
 	"time"
 )
 
-func (uc *UseCase) SignInVerify(ctx context.Context, code string) (*dto.TokensResponse, error) {
+func (uc *UseCase) SignInVerify(ctx context.Context, code string) (dto.TokensResponse, error) {
 	userID, err := uc.redis.Get2FACode(ctx, code)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get 2fa code: %w", err)
+		return dto.TokensResponse{}, fmt.Errorf("failed to get 2fa code: %w", err)
 	}
 
 	err = uc.redis.Delete2FACode(ctx, code)
 	if err != nil {
-		return nil, fmt.Errorf("failed to delete 2fa code: %w", err)
+		return dto.TokensResponse{}, fmt.Errorf("failed to delete 2fa code: %w", err)
 	}
 
 	user, err := uc.registry.GetRepo().SelectUserByUUID(ctx, userID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user: %w", err)
+		return dto.TokensResponse{}, fmt.Errorf("failed to get user: %w", err)
 	}
 
 	token, err := uc.generateJWT(user.UUID.String())
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate jwt: %w", err)
+		return dto.TokensResponse{}, fmt.Errorf("failed to generate jwt: %w", err)
 	}
 
 	refreshToken, err := uc.registry.GetRepo().InsertToken(ctx, user.UUID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to insert token: %w", err)
+		return dto.TokensResponse{}, fmt.Errorf("failed to insert token: %w", err)
 	}
 
-	return &dto.TokensResponse{AccessToken: token, RefreshToken: refreshToken.String()}, nil
+	return dto.TokensResponse{AccessToken: token, RefreshToken: refreshToken.String()}, nil
 }
 
 func (uc *UseCase) generateJWT(userUUID string) (string, error) {

@@ -1,3 +1,5 @@
+# Public
+
 ### Send POST request with json body
 POST http://localhost:1234/sign-up
 Content-Type: application/json
@@ -5,7 +7,7 @@ Content-Type: application/json
 {
   "login": "user",
   "password": "password",
-  "telegram": "patyukin"
+  "telegram": "telegram_login"
 }
 
 
@@ -16,11 +18,11 @@ Content-Type: application/json
 {
   "login": "user",
   "password": "password",
-  "telegram": "patyukin"
+  "telegram": "telegram_login"
 }
 
 
-### login
+### Login
 POST http://localhost:1234/sign-in
 Content-Type: application/json
 
@@ -30,11 +32,26 @@ Content-Type: application/json
 }
 
 
-### login - verify
+### Login - verify code
 POST http://localhost:1234/sign-in-verify
 Content-Type: application/json
 
 {
-  "code": "858cb626d00cc3cf1d9a27129c3c7a5bddd75805cbef4f7db69dbd52d461"
+  "code": "3dd4fe335abf6e3e0246a203db7d585d1d8043f30e47e56e664076212606"
 }
+
+
+### refresh tokens
+POST http://localhost:1234/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "44d946c9-368e-4a97-8af5-0b9020de807b"
+}
+
+
+### Get user info
+GET http://localhost:1234/user-info/019117c8-5aa9-7f3a-ad61-6562642d3464
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjI2OTExMDQsImlkIjoiOWEwOTllYWYtYWViZC00ZGE4LWFjMTAtZDcwMzJkNmMxM2IzIn0.mWbRpHGpfgdMm7Xzn9MTWxwhpCXqIzhzimP2sQkvu7g
+Content-Type: application/json
 

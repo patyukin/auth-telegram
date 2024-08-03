@@ -13,7 +13,7 @@ import (
 
 func (uc *UseCase) ResendCode(ctx context.Context, in model.SignUpData) (dto.SignUpResponse, error) {
 	var err error
-	var user model.User
+	var user model.CheckerPasswordData
 	var code uuid.UUID
 
 	err = uc.registry.ReadCommitted(ctx, func(ctx context.Context, repo *db.Repository) error {

@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (uc *UseCase) GetUserFullInfo(ctx context.Context, userID uuid.UUID) (dto.User, error) {
+func (uc *UseCase) GetUserInfoByUUID(ctx context.Context, userID uuid.UUID) (dto.User, error) {
 	user, err := uc.registry.GetRepo().SelectUserByUUID(ctx, userID.String())
 	if err != nil {
 		return dto.User{}, fmt.Errorf("failed getting user: %w", err)

@@ -10,22 +10,9 @@ import (
 
 func (uc *UseCase) handleStartCommand(ctx context.Context, message *tgbotapi.Message) {
 	args := message.CommandArguments()
-	replyKeyboard := tgbotapi.NewReplyKeyboard(
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("/help"),
-			tgbotapi.NewKeyboardButton("/generate_code"),
-		),
-	)
-
-	msg := tgbotapi.NewMessage(message.Chat.ID, "Welcome! Use the menu below to interact with the bot.")
-	msg.ReplyMarkup = replyKeyboard
-	if _, err := uc.bot.API.Send(msg); err != nil {
-		log.Error().Msgf("Error sending message: %v", err)
-		return
-	}
 
 	if args == "" {
-		msg = tgbotapi.NewMessage(message.Chat.ID, "Welcome! Please provide a valid invite link to start.")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "Welcome! Please provide a valid invite link to start.")
 		if _, err := uc.bot.API.Send(msg); err != nil {
 			log.Error().Msgf("Error sending message: %v", err)
 			return
@@ -38,7 +25,7 @@ func (uc *UseCase) handleStartCommand(ctx context.Context, message *tgbotapi.Mes
 	code, err := uuid.Parse(args)
 	if err != nil {
 		log.Error().Msgf("Error parsing invite code: %v", err)
-		msg = tgbotapi.NewMessage(message.Chat.ID, "Invalid invite link.")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "Invalid invite link.")
 		if _, err = uc.bot.API.Send(msg); err != nil {
 			log.Error().Msgf("Error sending message: %v", err)
 			return
@@ -51,7 +38,7 @@ func (uc *UseCase) handleStartCommand(ctx context.Context, message *tgbotapi.Mes
 	allSignUpCode, err := uc.redis.GetSignUpCode(ctx, message.From.UserName)
 	if err != nil {
 		log.Error().Msgf("Error getting sign up code: %v", err)
-		msg = tgbotapi.NewMessage(message.Chat.ID, "Invalid invite link.")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "Invalid invite link.")
 		if _, err = uc.bot.API.Send(msg); err != nil {
 			log.Error().Msgf("Error sending message: %v", err)
 			return
@@ -65,7 +52,7 @@ func (uc *UseCase) handleStartCommand(ctx context.Context, message *tgbotapi.Mes
 
 	signUpCode, err := uuid.Parse(result[0])
 	if err != nil {
-		msg = tgbotapi.NewMessage(message.Chat.ID, "Error was encountered. Please try again.")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "Error was encountered. Please try again.")
 		if _, err = uc.bot.API.Send(msg); err != nil {
 			log.Error().Msgf("Error sending message: %v", err)
 			return
@@ -77,7 +64,7 @@ func (uc *UseCase) handleStartCommand(ctx context.Context, message *tgbotapi.Mes
 
 	if signUpCode.String() != code.String() {
 		log.Error().Msgf("Error parsing invite code: %v != %v", signUpCode.String(), code.String())
-		msg = tgbotapi.NewMessage(message.Chat.ID, "Invalid invite link.")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "Invalid invite link.")
 		if _, err = uc.bot.API.Send(msg); err != nil {
 			log.Error().Msgf("Error sending message: %v", err)
 			return
@@ -90,7 +77,7 @@ func (uc *UseCase) handleStartCommand(ctx context.Context, message *tgbotapi.Mes
 	err = uc.redis.DeleteSignUpCode(ctx, message.From.UserName)
 	if err != nil {
 		log.Error().Msgf("Error deleting sign up code: %v", err)
-		msg = tgbotapi.NewMessage(message.Chat.ID, "Error was encountered. Please try again.")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "Error was encountered. Please try again.")
 		if _, err = uc.bot.API.Send(msg); err != nil {
 			log.Error().Msgf("Error sending message: %v", err)
 			return
@@ -102,7 +89,7 @@ func (uc *UseCase) handleStartCommand(ctx context.Context, message *tgbotapi.Mes
 
 	userUUID, err := uuid.Parse(result[1])
 	if err != nil {
-		msg = tgbotapi.NewMessage(message.Chat.ID, "Error was encountered. Please try again.")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "Error was encountered. Please try again.")
 		if _, err = uc.bot.API.Send(msg); err != nil {
 			log.Error().Msgf("Error sending message: %v", err)
 			return
@@ -114,7 +101,7 @@ func (uc *UseCase) handleStartCommand(ctx context.Context, message *tgbotapi.Mes
 
 	err = uc.registry.GetRepo().UpdateTelegramUserAfterSignUp(ctx, userUUID, message.Chat.ID, message.From.ID)
 	if err != nil {
-		msg = tgbotapi.NewMessage(message.Chat.ID, "Error was encountered. Please try again.")
+		msg := tgbotapi.NewMessage(message.Chat.ID, "Error was encountered. Please try again.")
 		if _, err = uc.bot.API.Send(msg); err != nil {
 			log.Error().Msgf("Error sending message: %v", err)
 			return
@@ -124,7 +111,7 @@ func (uc *UseCase) handleStartCommand(ctx context.Context, message *tgbotapi.Mes
 		return
 	}
 
-	msg = tgbotapi.NewMessage(message.Chat.ID, "You have successfully signed up!")
+	msg := tgbotapi.NewMessage(message.Chat.ID, "You have successfully signed up!")
 	if _, err = uc.bot.API.Send(msg); err != nil {
 		log.Error().Msgf("Error sending message: %v", err)
 		return

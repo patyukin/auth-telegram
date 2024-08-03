@@ -2,10 +2,11 @@ package usecase
 
 import (
 	"auth-telegram/internal/cacher"
+	"auth-telegram/internal/converter"
 	"auth-telegram/internal/db"
+	"auth-telegram/internal/handler/dto"
 	"auth-telegram/internal/telegram"
 	"context"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,7 +14,7 @@ type UseCase struct {
 	registry  *db.Client
 	redis     *cacher.Cacher
 	bot       *telegram.Bot
-	jwtSecret string
+	jwtSecret []byte
 }
 
 func New(registry *db.Client, redis *cacher.Cacher, bot *telegram.Bot, jwtSecret string) *UseCase {
@@ -21,7 +22,7 @@ func New(registry *db.Client, redis *cacher.Cacher, bot *telegram.Bot, jwtSecret
 		registry:  registry,
 		redis:     redis,
 		bot:       bot,
-		jwtSecret: jwtSecret,
+		jwtSecret: []byte(jwtSecret),
 	}
 }
 
@@ -43,16 +44,16 @@ func (uc *UseCase) CheckPasswordHash(password, hashedPassword string) bool {
 	return err == nil
 }
 
-func (uc *UseCase) GetUserIDByToken(ctx context.Context, id string) (uuid.UUID, error) {
-	userUUID, err := uc.registry.GetRepo().SelectUserUUIDByUUID(ctx, id)
+func (uc *UseCase) GetUserAuthInfoByToken(ctx context.Context, id string) (dto.UserAuthInfo, error) {
+	userAuthInfo, err := uc.registry.GetRepo().SelectUserAuthInfoByUUID(ctx, id)
 	if err != nil {
-		return uuid.UUID{}, err
+		return dto.UserAuthInfo{}, err
 	}
 
-	return userUUID, nil
+	return converter.ToUserAuthInfoFromModelUserInfo(userAuthInfo), nil
 }
 
-func (uc *UseCase) GetJWTToken() string {
+func (uc *UseCase) GetJWTToken() []byte {
 	return uc.jwtSecret
 }
 

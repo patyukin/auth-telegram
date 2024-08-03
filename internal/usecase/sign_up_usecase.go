@@ -18,8 +18,7 @@ func (uc *UseCase) SignUp(ctx context.Context, in model.SignUpData) (dto.SignUpR
 		return dto.SignUpResponse{}, fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	var userUUID uuid.UUID
-	var code uuid.UUID
+	var userUUID, code uuid.UUID
 
 	err = uc.registry.ReadCommitted(ctx, func(ctx context.Context, repo *db.Repository) error {
 		userUUID, err = uc.registry.GetRepo().InsertIntoUser(ctx, in)

@@ -25,17 +25,17 @@ func (r *Repository) InsertIntoUser(ctx context.Context, in model.SignUpData) (u
 	return id, nil
 }
 
-func (r *Repository) SelectUserByLogin(ctx context.Context, login string) (model.User, error) {
-	query := `SELECT id, login, password_hash, name, surname, role, created_at, updated_at FROM users WHERE login = $1`
+func (r *Repository) SelectUserByLogin(ctx context.Context, login string) (model.CheckerPasswordData, error) {
+	query := `SELECT id, password_hash FROM users WHERE login = $1`
 	row := r.db.QueryRowContext(ctx, query, login)
 	if row.Err() != nil {
-		return model.User{}, fmt.Errorf("failed to select user: %w", row.Err())
+		return model.CheckerPasswordData{}, fmt.Errorf("failed to select user: %w", row.Err())
 	}
 
-	var user model.User
-	err := row.Scan(&user.UUID, &user.Login, &user.PasswordHash, &user.Name, &user.Surname, &user.Role, &user.CreatedAt, &user.UpdatedAt)
+	var user model.CheckerPasswordData
+	err := row.Scan(&user.UUID, &user.PasswordHash)
 	if err != nil {
-		return model.User{}, fmt.Errorf("failed to select user: %w", err)
+		return model.CheckerPasswordData{}, fmt.Errorf("failed to select user: %w", err)
 	}
 
 	return user, nil
@@ -120,18 +120,19 @@ func (r *Repository) UpdateTelegramUserAfterSignUp(ctx context.Context, userUUID
 	return nil
 }
 
-func (r *Repository) SelectUserUUIDByUUID(ctx context.Context, userUUID string) (uuid.UUID, error) {
-	query := `SELECT id FROM users WHERE id = $1`
+func (r *Repository) SelectUserAuthInfoByUUID(ctx context.Context, userUUID string) (model.UserAuthInfo, error) {
+	query := `SELECT id, role FROM users WHERE id = $1`
 	row := r.db.QueryRowContext(ctx, query, userUUID)
 	if row.Err() != nil {
-		return uuid.UUID{}, fmt.Errorf("failed to select user: %w", row.Err())
+		return model.UserAuthInfo{}, fmt.Errorf("failed to select user: %w", row.Err())
 	}
 
 	var id uuid.UUID
-	err := row.Scan(&id)
+	var role string
+	err := row.Scan(&id, &role)
 	if err != nil {
-		return uuid.UUID{}, fmt.Errorf("failed to select user: %w", err)
+		return model.UserAuthInfo{}, fmt.Errorf("failed to select user: %w", err)
 	}
 
-	return id, nil
+	return model.UserAuthInfo{UserUUID: id, Role: model.UserRole(role)}, nil
 }

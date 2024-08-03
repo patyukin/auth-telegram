@@ -11,8 +11,11 @@ import (
 )
 
 type Config struct {
-	MinLogLevel string `yaml:"min_log_level" validate:"required,oneof=debug info warn error"`
-	PostgreSQL  struct {
+	HttpPort     int    `yaml:"http_port" validate:"required,numeric"`
+	ReadTimeout  int    `yaml:"read_timeout" validate:"required,numeric"`
+	WriteTimeout int    `yaml:"write_timeout" validate:"required,numeric"`
+	MinLogLevel  string `yaml:"min_log_level" validate:"required,oneof=debug info warn error"`
+	PostgreSQL   struct {
 		Host     string `yaml:"host" validate:"required"`
 		Port     int    `yaml:"port" validate:"required,numeric"`
 		User     string `yaml:"user" validate:"required"`

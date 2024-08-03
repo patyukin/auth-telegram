@@ -13,6 +13,7 @@ import (
 	"auth-telegram/internal/telegram"
 	"auth-telegram/internal/usecase"
 	"context"
+	"fmt"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/sirupsen/logrus"
@@ -63,13 +64,16 @@ func main() {
 
 	srv := server.New(rtr)
 	cj := cronjob.NewCronJob(uc)
-	err = cj.Run(ctx)
-	if err != nil {
-		log.Fatal().Msgf("failed adding cron job, err: %v", err)
-	}
 
 	go func() {
-		if err = srv.Run("0.0.0.0:1234"); err != nil {
+		if err = cj.Run(ctx); err != nil {
+			log.Error().Msgf("failed adding cron job, err: %v", err)
+			errCh <- err
+		}
+	}()
+
+	go func() {
+		if err = srv.Run(fmt.Sprintf(":%d", cfg.HttpPort), cfg); err != nil {
 			log.Error().Msgf("failed running http server: %v", err)
 			errCh <- err
 		}

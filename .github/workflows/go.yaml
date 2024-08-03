@@ -70,4 +70,4 @@ jobs:
             docker rm $CONTAINER_NAME
             
             # Run a new container from a new image
-            docker run -d -p 1212:1234 --name $CONTAINER_NAME --network=pg --network=redis -t $REGISTRY/$IMAGE_NAME:$TAG_NAME
+            docker run -d -p 1234:1234 --name $CONTAINER_NAME --network=pg --network=redis -t $REGISTRY/$IMAGE_NAME:$TAG_NAME

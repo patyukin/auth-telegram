@@ -9,9 +9,9 @@ import (
 func (h *Handler) Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		accessToken := r.Header.Get(HeaderAuthorization)
-		if accessToken == "" {
-			h.HandleError(w, http.StatusUnauthorized, "missing token")
+		accessToken, err := GetBearerToken(r)
+		if err != nil {
+			h.HandleError(w, http.StatusUnauthorized, err.Error())
 			return
 		}
 
@@ -29,13 +29,8 @@ func (h *Handler) Auth(next http.Handler) http.Handler {
 		}
 
 		id := token.Claims.(jwt.MapClaims)["id"].(string)
-		uuid, err := h.uc.GetUserIDByToken(r.Context(), id)
-		if err != nil {
-			h.HandleError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
 
-		r.Header.Set(HeaderUserID, uuid.String())
+		r.Header.Set(HeaderUserID, id)
 
 		next.ServeHTTP(w, r)
 	})
