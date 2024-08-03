@@ -27,6 +27,7 @@ jobs:
 
       - name: Create .env file
         run: |
+          touch .env
           echo TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }} >> .env
           echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
           echo DB_HOST=${{ secrets.DB_HOST }} >> .env
@@ -69,4 +70,4 @@ jobs:
             docker rm $CONTAINER_NAME
             
             # Run a new container from a new image
-            docker run -d -p 1212:1234 --name $CONTAINER_NAME --network=pg --network=redis -t $REGISTRY/$IMAGE_NAME:$TAG_NAME
+            docker run -d -p 1212:1234 --name $CONTAINER_NAME --network=${{ secrets.DB_HOST }} --network=${{ secrets.REDIS_HOST }} -t $REGISTRY/$IMAGE_NAME:$TAG_NAME
