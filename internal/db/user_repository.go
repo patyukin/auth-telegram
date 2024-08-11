@@ -136,3 +136,20 @@ func (r *Repository) SelectUserAuthInfoByUUID(ctx context.Context, userUUID stri
 
 	return model.UserAuthInfo{UserUUID: id, Role: model.UserRole(role)}, nil
 }
+
+func (r *Repository) InsertIntoUserV2(ctx context.Context, in model.SignUpV2Data) (uuid.UUID, error) {
+	currentTime := time.Now().UTC()
+	query := `INSERT INTO users (login, password_hash, created_at) VALUES ($1, $2, $3) RETURNING id`
+	row := r.db.QueryRowContext(ctx, query, in.Login, in.Password, currentTime)
+	if row.Err() != nil {
+		return uuid.UUID{}, fmt.Errorf("failed to insert user: %w", row.Err())
+	}
+
+	var id uuid.UUID
+	err := row.Scan(&id)
+	if err != nil {
+		return uuid.UUID{}, fmt.Errorf("failed to insert user: %w", err)
+	}
+
+	return id, nil
+}

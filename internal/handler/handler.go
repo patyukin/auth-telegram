@@ -20,6 +20,7 @@ const (
 
 type UseCase interface {
 	SignUp(ctx context.Context, loginData model.SignUpData) (dto.SignUpResponse, error)
+	SignUpV2(ctx context.Context, in model.SignUpV2Data) (dto.SignUpV2Response, error)
 	ResendCode(ctx context.Context, loginData model.SignUpData) (dto.SignUpResponse, error)
 	SignIn(ctx context.Context, signInData model.SignInData) error
 	SignInVerify(ctx context.Context, code string) (dto.TokensResponse, error)

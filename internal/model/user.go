@@ -14,6 +14,11 @@ type SignUpData struct {
 	Telegram string `json:"telegram"`
 }
 
+type SignUpV2Data struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
 type SignInData struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`

@@ -6,11 +6,12 @@ WORKDIR /app
 
 COPY . /app
 
-ENV CONFIG_FILE_PATH=/app/config.yaml
+ENV YAML_CONFIG_FILE_PATH=config.yaml
+ENV ENV_CONFIG_FILE_PATH=.env
 
 RUN go mod tidy && \
     go mod download && \
     go get github.com/githubnemo/CompileDaemon && \
     go install github.com/githubnemo/CompileDaemon
 
-ENTRYPOINT CompileDaemon --build="go build -o bin/auth cmd/auth/main.go" --command=./bin/auth
+ENTRYPOINT CompileDaemon --build="go build -o ./auth cmd/auth/main.go" --command=./auth

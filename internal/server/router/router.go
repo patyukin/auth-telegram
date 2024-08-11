@@ -18,6 +18,7 @@ func Init(h *handler.Handler) http.Handler {
 
 	// public handlers
 	r.Handle("POST /sign-up", h.CORS(h.LogUser(http.HandlerFunc(h.SignUpHandler))))
+	r.Handle("POST /v2/sign-up", h.CORS(h.LogUser(http.HandlerFunc(h.SignUpV2Handler))))
 	r.Handle("POST /resend-code", h.CORS(h.LogUser(http.HandlerFunc(h.ResendCodeHandler))))
 	r.Handle("POST /sign-in", h.CORS(h.LogUser(http.HandlerFunc(h.SignInHandler))))
 	r.Handle("POST /sign-in-verify", h.CORS(h.LogUser(http.HandlerFunc(h.SignInVerifyHandler))))

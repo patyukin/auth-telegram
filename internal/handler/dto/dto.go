@@ -23,3 +23,7 @@ type UserAuthInfo struct {
 	UserUUID string `json:"user_id"`
 	Role     string `json:"role"`
 }
+
+type SignUpV2Response struct {
+	UserUUID string `json:"user_id"`
+}
