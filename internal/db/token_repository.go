@@ -41,3 +41,19 @@ func (r *Repository) DeleteToken(ctx context.Context, refreshToken string) error
 
 	return nil
 }
+
+func (r *Repository) SelectServiceTokenByName(ctx context.Context, name string) (string, error) {
+	query := `SELECT secret FROM services WHERE name = $1`
+	row := r.db.QueryRowContext(ctx, query, name)
+	if row.Err() != nil {
+		return "", fmt.Errorf("failed to select token: %w", row.Err())
+	}
+
+	var hash string
+	err := row.Scan(&hash)
+	if err != nil {
+		return "", fmt.Errorf("failed to select token: %w", err)
+	}
+
+	return hash, nil
+}

@@ -30,6 +30,7 @@ type UseCase interface {
 	GenerateTokens(ctx context.Context, refreshToken string) (dto.TokensResponse, error)
 	GetTelegramBot() string
 	GetJWTToken() []byte
+	GetTokenByName(ctx context.Context, name string) (string, error)
 }
 
 type Handler struct {
