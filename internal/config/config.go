@@ -3,11 +3,9 @@ package config
 import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
-	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
-	"strconv"
 )
 
 type Config struct {
@@ -20,7 +18,7 @@ type Config struct {
 		Port     int    `yaml:"port" validate:"required,numeric"`
 		User     string `yaml:"user" validate:"required"`
 		Password string `yaml:"password" validate:"required"`
-		Name     string `yaml:"database" validate:"required"`
+		Name     string `yaml:"name" validate:"required"`
 	} `yaml:"postgresql"`
 	Redis struct {
 		Host string `yaml:"host" validate:"required"`
@@ -54,34 +52,6 @@ func LoadConfig() (*Config, error) {
 	if err = decoder.Decode(&config); err != nil {
 		return nil, fmt.Errorf("unable to decode config file: %w", err)
 	}
-
-	envConfigFilePath := os.Getenv("ENV_CONFIG_FILE_PATH")
-	if err = godotenv.Load(envConfigFilePath); err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	// postgresql
-	config.PostgreSQL.Host = os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	config.PostgreSQL.Port, err = strconv.Atoi(dbPort)
-	if err != nil {
-		return nil, fmt.Errorf("config validation failed: %w", err)
-	}
-
-	config.PostgreSQL.User = os.Getenv("DB_USER")
-	config.PostgreSQL.Password = os.Getenv("DB_PASSWORD")
-	config.PostgreSQL.Name = os.Getenv("DB_NAME")
-
-	// redis
-	config.Redis.Host = os.Getenv("REDIS_HOST")
-	redisPort := os.Getenv("REDIS_PORT")
-	config.Redis.Port, err = strconv.Atoi(redisPort)
-	if err != nil {
-		return nil, fmt.Errorf("config validation failed: %w", err)
-	}
-
-	config.Telegram.Token = os.Getenv("TELEGRAM_TOKEN")
-	config.JwtSecret = os.Getenv("JWT_SECRET")
 
 	validate := validator.New()
 	if err = validate.Struct(&config); err != nil {

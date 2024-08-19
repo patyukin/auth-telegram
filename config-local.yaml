@@ -2,3 +2,15 @@ min_log_level: "debug"
 http_port: 1234
 read_timeout: 10
 write_timeout: 5
+telegram:
+  token: ""
+jwt_secret: ""
+postgresql:
+  host: "localhost"
+  port: 5432
+  user: "user"
+  password: "user"
+  name: "auth"
+redis:
+  host: "redis"
+  port: 6379
