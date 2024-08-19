@@ -54,7 +54,7 @@ jobs:
             docker stop $CONTAINER_NAME
             
             # Remove old container
-            docker rm $CONTAINER_NAME
+            docker rm -f $CONTAINER_NAME
             
             # cd to project directory
             cd ~/auth-telegram
