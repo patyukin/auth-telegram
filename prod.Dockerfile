@@ -11,6 +11,7 @@ FROM alpine:3.19
 
 WORKDIR /app
 COPY --from=builder /app/bin/auth .
+ENV YAML_CONFIG_FILE_PATH=config.yaml
 COPY migrations migrations
 
 CMD ["./auth"]
