@@ -59,12 +59,5 @@ jobs:
             # cd to project directory
             cd ~/auth-telegram
             
-            # Run a new container from a new image
-            docker run -d \
-              -p 1234:1234 \
-              -v ./config.yaml:/app/config.yaml \
-              --network=pg \
-              --network=redis \
-              --network=allapps \
-              --name $CONTAINER_NAME \
-              -t $REGISTRY/$IMAGE_NAME:$TAG_NAME
+            # deploy
+            ./deploy.sh $TAG_NAME
