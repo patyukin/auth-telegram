@@ -27,3 +27,11 @@ type UserAuthInfo struct {
 type SignUpV2Response struct {
 	UserUUID string `json:"user_id"`
 }
+
+type ValidateTokenRequest struct {
+	Token string `json:"token"`
+}
+
+type ValidateTokenResponse struct {
+	UUID string `json:"id"`
+}

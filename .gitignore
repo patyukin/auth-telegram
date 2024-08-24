@@ -4,3 +4,5 @@ go_build_*
 /.env.local
 /bin/*
 config.yaml
+config-local.yaml
+/auth

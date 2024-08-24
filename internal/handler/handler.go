@@ -23,6 +23,7 @@ type UseCase interface {
 	SignUpV2(ctx context.Context, in model.SignUpV2Data) (dto.SignUpV2Response, error)
 	ResendCode(ctx context.Context, loginData model.SignUpData) (dto.SignUpResponse, error)
 	SignIn(ctx context.Context, signInData model.SignInData) error
+	SignInV2(ctx context.Context, signInData model.SignInData) (dto.TokensResponse, error)
 	SignInVerify(ctx context.Context, code string) (dto.TokensResponse, error)
 	GetUserAuthInfoByToken(ctx context.Context, id string) (dto.UserAuthInfo, error)
 	GetUserFullInfo(ctx context.Context, userID uuid.UUID) (dto.User, error)
@@ -31,6 +32,7 @@ type UseCase interface {
 	GetTelegramBot() string
 	GetJWTToken() []byte
 	GetTokenByName(ctx context.Context, name string) (string, error)
+	ValidateToken(token string) (string, error)
 }
 
 type Handler struct {

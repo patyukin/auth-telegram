@@ -2,6 +2,9 @@ services:
   app:
     build:
       dockerfile: local.Dockerfile
+    container_name: auth-telegram-container
+    volumes:
+      - .:/app
     restart: always
     ports:
       - "1212:1234"

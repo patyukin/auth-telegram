@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log/slog"
+	"github.com/rs/zerolog/log"
 )
 
 type QueryExecutor interface {
@@ -37,9 +37,9 @@ func (c *Client) ReadCommitted(ctx context.Context, f Handler) error {
 	}
 
 	defer func() {
-		if !errors.Is(err, sql.ErrTxDone) {
+		if err != nil && !errors.Is(err, sql.ErrTxDone) {
 			if errRollback := tx.Rollback(); errRollback != nil {
-				slog.ErrorContext(ctx, "failed to rollback transaction", slog.Any("error", errRollback))
+				log.Error().Msgf("failed to rollback transaction: %v", errRollback)
 			}
 		}
 	}()
