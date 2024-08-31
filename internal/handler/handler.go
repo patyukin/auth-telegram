@@ -52,8 +52,7 @@ func (h *Handler) HandleError(w http.ResponseWriter, code int, message string) {
 
 	w.WriteHeader(code)
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(ErrorResponse{Error: message})
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(ErrorResponse{Error: message}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

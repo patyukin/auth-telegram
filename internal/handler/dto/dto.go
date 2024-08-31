@@ -1,5 +1,13 @@
 package dto
 
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
+type ResendCodeResponse struct {
+	Message string `json:"message"`
+}
+
 type SignUpResponse struct {
 	BotName string `json:"bot_name"`
 	Code    string `json:"code"`

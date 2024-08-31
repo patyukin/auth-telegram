@@ -5,14 +5,23 @@ import (
 	"auth-telegram/internal/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 )
 
+// @title Example API
+// @version 1.0
+// @description This is a sample server.
+// @host localhost:8080
+// @BasePath /
 func Init(h *handler.Handler) http.Handler {
 	prometheus.MustRegister(metrics.IncomingTraffic)
 
 	r := http.ServeMux{}
 
+	r.Handle("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://0.0.0.0:1234/swagger/doc.json"),
+	))
 	// metrics
 	r.Handle("GET /metrics", promhttp.Handler())
 
