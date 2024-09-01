@@ -11,8 +11,8 @@ import (
 )
 
 // ResendCodeHandler godoc
-// @Summary      Resend verification code
-// @Description  Resend a verification code to the user based on the provided sign-up data
+// @Summary      Повторная отправка кода
+// @Description  Повторная отправка кода для окончания регистрации
 // @Tags         Auth
 // @Accept       json
 // @Produce      json
@@ -20,7 +20,7 @@ import (
 // @Success      200   {object}  dto.ResendCodeResponse  "Message with link to complete registration"
 // @Failure      400   {object}  ErrorResponse    "Invalid input data"
 // @Failure      500   {object}  ErrorResponse    "Internal server error"
-// @Router       /auth/resend-code [post]
+// @Router       /resend-code [post]
 func (h *Handler) ResendCodeHandler(w http.ResponseWriter, r *http.Request) {
 	var in model.SignUpData
 

@@ -33,6 +33,9 @@ type UseCase interface {
 	GetJWTToken() []byte
 	GetTokenByName(ctx context.Context, name string) (string, error)
 	ValidateToken(token string) (string, error)
+	UpdateUser(ctx context.Context, user dto.UpdateUserRequest, userUUID string) error
+	GetUserAuthInfoByAdmin(ctx context.Context, id string) (dto.AdminUserInfo, error)
+	ChangePassword(ctx context.Context, req dto.ChangePasswordRequest, userUUID string) error
 }
 
 type Handler struct {

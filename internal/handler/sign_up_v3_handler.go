@@ -9,14 +9,25 @@ import (
 	"strings"
 )
 
+// SignUpV3Handler godoc
+// @Summary      Регистрация нового пользователя
+// @Description  Регистрация нового пользователя с версией v3
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        body  body model.SignUpV2Data true "Sign Up v3 Data Request"
+// @Success      200   {object}  dto.SignUpV2Response "Validate token successfully"
+// @Failure      400   {object}  ErrorResponse "Invalid request body"
+// @Failure      500   {object}  ErrorResponse "Internal server error"
+// @Router       /v3/sign-up [post]
 func (h *Handler) SignUpV3Handler(w http.ResponseWriter, r *http.Request) {
+	log.Debug().Msgf("start sign up")
+
 	var in model.SignUpV2Data
 	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	log.Debug().Msgf("data in: %v", in)
 
 	tokenWithService := r.Header.Get("Authorization")
 	parts := strings.SplitN(tokenWithService, ":", 2)

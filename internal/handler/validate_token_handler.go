@@ -7,6 +7,17 @@ import (
 	"net/http"
 )
 
+// ValidateTokenHandler godoc
+// @Summary      Валидация access токена
+// @Description  Валидация access токена
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        body  body dto.ValidateTokenRequest true "Validate Token Request"
+// @Success      200   {object}  dto.ValidateTokenResponse "Validate token successfully"
+// @Failure      400   {object}  ErrorResponse "Invalid request body"
+// @Failure      500   {object}  ErrorResponse "Internal server error"
+// @Router       /v1/validate-token [post]
 func (h *Handler) ValidateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var token dto.ValidateTokenRequest
 	if err := json.NewDecoder(r.Body).Decode(&token); err != nil {

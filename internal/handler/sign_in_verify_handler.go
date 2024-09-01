@@ -7,6 +7,17 @@ import (
 	"net/http"
 )
 
+// SignInVerifyHandler godoc
+// @Summary      Окончание регистрации нового пользователя
+// @Description  Окончание регистрации нового пользователя. Пользователь должен прислать токен для подтверждения его регистрации
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        body  body model.SignInVerifyData true "SignInVerifyData Request"
+// @Success      200   {object}  dto.TokensResponse "Registration successfully"
+// @Failure      400   {object}  ErrorResponse "Invalid request body"
+// @Failure      500   {object}  ErrorResponse "Internal server error"
+// @Router       /v2/sign-up [post]
 func (h *Handler) SignInVerifyHandler(w http.ResponseWriter, r *http.Request) {
 	var signInVerifyData model.SignInVerifyData
 

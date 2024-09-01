@@ -15,9 +15,53 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/refresh-tokens": {
+        "/admin/user-info/{id}": {
+            "get": {
+                "description": "Получение информации о пользователе по его UUID для админа",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get admin user information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID (UUID)",
+                        "name": "user_id",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AdminUserInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/refresh": {
             "post": {
-                "description": "Generates new access and refresh tokens using a provided refresh token",
+                "description": "Генерация refresh, access токенов",
                 "consumes": [
                     "application/json"
                 ],
@@ -27,7 +71,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Generate new access and refresh tokens",
+                "summary": "Генерация новых токенов",
                 "parameters": [
                     {
                         "description": "Refresh Token Request",
@@ -61,9 +105,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/resend-code": {
+        "/resend-code": {
             "post": {
-                "description": "Resend a verification code to the user based on the provided sign-up data",
+                "description": "Повторная отправка кода для окончания регистрации",
                 "consumes": [
                     "application/json"
                 ],
@@ -73,7 +117,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Resend verification code",
+                "summary": "Повторная отправка кода",
                 "parameters": [
                     {
                         "description": "Sign-up data required to resend the code",
@@ -107,9 +151,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/sign-in": {
+        "/sign-in": {
             "post": {
-                "description": "Authenticate a user with the provided sign-in data",
+                "description": "Аутентификация пользователя по логину и паролю в системе",
                 "consumes": [
                     "application/json"
                 ],
@@ -119,7 +163,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "User Sign In",
+                "summary": "Вход в систему",
                 "parameters": [
                     {
                         "description": "Sign-in data",
@@ -146,6 +190,52 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to sign in",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sign-up": {
+            "post": {
+                "description": "Регистрация нового пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Регистрация нового пользователя",
+                "parameters": [
+                    {
+                        "description": "Sign Up Data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SignUpData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "1 этап регистрации завершен успешно",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SignUpV1Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/handler.ErrorResponse"
                         }
@@ -196,9 +286,284 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v1/sign-up": {
+            "post": {
+                "description": "Регистрация нового пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Регистрация нового пользователя",
+                "parameters": [
+                    {
+                        "description": "Sign Up Data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SignUpData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "1 этап регистрации завершен успешно",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SignUpV1Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/validate-token": {
+            "post": {
+                "description": "Валидация access токена",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Валидация access токена",
+                "parameters": [
+                    {
+                        "description": "Validate Token Request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ValidateTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Validate token successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ValidateTokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/sign-in": {
+            "post": {
+                "description": "Аутентификация пользователя по логину и паролю в системе с версией v2",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Вход в систему с версией v2",
+                "parameters": [
+                    {
+                        "description": "Sign-in data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SignInData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully signed in",
+                        "schema": {
+                            "$ref": "#/definitions/dto.TokensResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input data",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to sign in",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/sign-up": {
+            "post": {
+                "description": "Регистрация нового пользователя с версией v2",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Регистрация нового пользователя",
+                "parameters": [
+                    {
+                        "description": "Sign Up v2 Data Request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SignUpV2Data"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Validate token successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SignUpV2Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v3/sign-up": {
+            "post": {
+                "description": "Регистрация нового пользователя с версией v3",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Регистрация нового пользователя",
+                "parameters": [
+                    {
+                        "description": "Sign Up v3 Data Request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.SignUpV2Data"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Validate token successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SignUpV2Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "dto.AdminUserInfo": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "surname": {
+                    "type": "string"
+                },
+                "telegram": {
+                    "type": "object",
+                    "properties": {
+                        "username": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ChangePasswordRequest": {
+            "type": "object",
+            "properties": {
+                "new_password": {
+                    "type": "string"
+                },
+                "old_password": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.RefreshTokenRequest": {
             "type": "object",
             "properties": {
@@ -215,6 +580,22 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SignUpV1Response": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SignUpV2Response": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.TokensResponse": {
             "type": "object",
             "properties": {
@@ -222,6 +603,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateUserRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "surname": {
                     "type": "string"
                 }
             }
@@ -249,6 +641,22 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ValidateTokenRequest": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ValidateTokenResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -268,6 +676,14 @@ const docTemplate = `{
                 }
             }
         },
+        "model.SignInVerifyData": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                }
+            }
+        },
         "model.SignUpData": {
             "type": "object",
             "properties": {
@@ -278,6 +694,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "telegram": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.SignUpV2Data": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }
