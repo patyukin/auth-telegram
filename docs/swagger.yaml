@@ -1,0 +1,455 @@
+definitions:
+  dto.AdminUserInfo:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      login:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      surname:
+        type: string
+      telegram:
+        properties:
+          username:
+            type: string
+        type: object
+      updated_at:
+        type: string
+    type: object
+  dto.ChangePasswordRequest:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
+  dto.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  dto.ResendCodeResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  dto.SignUpV1Response:
+    properties:
+      message:
+        type: string
+    type: object
+  dto.SignUpV2Response:
+    properties:
+      user_id:
+        type: string
+    type: object
+  dto.TokensResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  dto.UpdateUserRequest:
+    properties:
+      name:
+        type: string
+      surname:
+        type: string
+    type: object
+  dto.User:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      login:
+        type: string
+      name:
+        type: string
+      surname:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.ValidateTokenRequest:
+    properties:
+      token:
+        type: string
+    type: object
+  dto.ValidateTokenResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  handler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  model.SignInData:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  model.SignInVerifyData:
+    properties:
+      code:
+        type: string
+    type: object
+  model.SignUpData:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+      telegram:
+        type: string
+    type: object
+  model.SignUpV2Data:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /admin/user-info/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Получение информации о пользователе по его UUID для админа
+      parameters:
+      - description: User ID (UUID)
+        in: header
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AdminUserInfo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Get admin user information
+      tags:
+      - users
+  /refresh:
+    post:
+      consumes:
+      - application/json
+      description: Генерация refresh, access токенов
+      parameters:
+      - description: Refresh Token Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tokens generated successfully
+          schema:
+            $ref: '#/definitions/dto.TokensResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Генерация новых токенов
+      tags:
+      - Auth
+  /resend-code:
+    post:
+      consumes:
+      - application/json
+      description: Повторная отправка кода для окончания регистрации
+      parameters:
+      - description: Sign-up data required to resend the code
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignUpData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Message with link to complete registration
+          schema:
+            $ref: '#/definitions/dto.ResendCodeResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Повторная отправка кода
+      tags:
+      - Auth
+  /sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Аутентификация пользователя по логину и паролю в системе
+      parameters:
+      - description: Sign-in data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignInData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully signed in, no content
+          schema:
+            type: nil
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Failed to sign in
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Вход в систему
+      tags:
+      - Auth
+  /sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация нового пользователя
+      parameters:
+      - description: Sign Up Data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignUpData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 1 этап регистрации завершен успешно
+          schema:
+            $ref: '#/definitions/dto.SignUpV1Response'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Регистрация нового пользователя
+      tags:
+      - Auth
+  /user/info:
+    get:
+      consumes:
+      - application/json
+      description: Получение информации о пользователе по его UUID
+      parameters:
+      - description: User ID (UUID)
+        in: header
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Get user information
+      tags:
+      - users
+  /v1/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация нового пользователя
+      parameters:
+      - description: Sign Up Data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignUpData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 1 этап регистрации завершен успешно
+          schema:
+            $ref: '#/definitions/dto.SignUpV1Response'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Регистрация нового пользователя
+      tags:
+      - Auth
+  /v1/validate-token:
+    post:
+      consumes:
+      - application/json
+      description: Валидация access токена
+      parameters:
+      - description: Validate Token Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ValidateTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Validate token successfully
+          schema:
+            $ref: '#/definitions/dto.ValidateTokenResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Валидация access токена
+      tags:
+      - Auth
+  /v2/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Аутентификация пользователя по логину и паролю в системе с версией
+        v2
+      parameters:
+      - description: Sign-in data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignInData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully signed in
+          schema:
+            $ref: '#/definitions/dto.TokensResponse'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Failed to sign in
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Вход в систему с версией v2
+      tags:
+      - Auth
+  /v2/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация нового пользователя с версией v2
+      parameters:
+      - description: Sign Up v2 Data Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignUpV2Data'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Validate token successfully
+          schema:
+            $ref: '#/definitions/dto.SignUpV2Response'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Регистрация нового пользователя
+      tags:
+      - Auth
+  /v3/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация нового пользователя с версией v3
+      parameters:
+      - description: Sign Up v3 Data Request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignUpV2Data'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Validate token successfully
+          schema:
+            $ref: '#/definitions/dto.SignUpV2Response'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Регистрация нового пользователя
+      tags:
+      - Auth
+swagger: "2.0"

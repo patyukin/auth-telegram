@@ -1,17 +1,31 @@
 package router
 
 import (
+	_ "auth-telegram/docs"
 	"auth-telegram/internal/handler"
 	"auth-telegram/internal/metrics"
+	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
+	"net/http/pprof"
 )
 
-func Init(h *handler.Handler) http.Handler {
+// Init godoc
+// @title Auth API
+// @version 1.0
+// @description Auth API for microservices
+// @host http://0.0.0.0:1234
+// @BasePath /
+func Init(h *handler.Handler, srvAddress string) http.Handler {
 	prometheus.MustRegister(metrics.IncomingTraffic)
 
 	r := http.ServeMux{}
+
+	r.Handle("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL(fmt.Sprintf("http://0.0.0.0%s/swagger/doc.json", srvAddress)),
+	))
 
 	// metrics
 	r.Handle("GET /metrics", promhttp.Handler())
@@ -34,7 +48,18 @@ func Init(h *handler.Handler) http.Handler {
 
 	// admin handlers
 	r.Handle("GET /admin/user-info/{id}", h.CORS(h.Auth(h.IsAdmin(h.LogUser(http.HandlerFunc(h.AdminGetUserInfoHandler))))))
-	r.Handle("GET /v2/user-info/{id}", h.CORS(h.Auth(h.IsAdmin(h.LogUser(http.HandlerFunc(h.GetUserInfoV2Handler))))))
+
+	// pprof
+	r.Handle("/debug/pprof/", http.HandlerFunc(pprof.Index))
+	r.Handle("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
+	r.Handle("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))
+	r.Handle("/handle/pprof/symbol", http.HandlerFunc(pprof.Symbol))
+	r.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
+	r.Handle("/debug/pprof/block", pprof.Handler("block"))
+	r.Handle("/debug/pprof/heap", pprof.Handler("heap"))
+	r.Handle("/debug/pprof/allocs", pprof.Handler("allocs"))
+	r.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
+	r.Handle("/debug/pprof/threadcreate", pprof.Handler("goroutine"))
 
 	return &r
 }

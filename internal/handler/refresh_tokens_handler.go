@@ -1,16 +1,24 @@
 package handler
 
 import (
+	"auth-telegram/internal/handler/dto"
 	"encoding/json"
 	"net/http"
 )
 
+// GenerateRefreshTokensHandler godoc
+// @Summary      Генерация новых токенов
+// @Description  Генерация refresh, access токенов
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        body  body dto.RefreshTokenRequest true "Refresh Token Request"
+// @Success      200   {object}  dto.TokensResponse "Tokens generated successfully"
+// @Failure      400   {object}  ErrorResponse "Invalid request body"
+// @Failure      500   {object}  ErrorResponse "Internal server error"
+// @Router       /refresh [post]
 func (h *Handler) GenerateRefreshTokensHandler(w http.ResponseWriter, r *http.Request) {
-	type RefreshTokenRequest struct {
-		RefreshToken string `json:"refresh_token"`
-	}
-
-	var refreshToken RefreshTokenRequest
+	var refreshToken dto.RefreshTokenRequest
 	if err := json.NewDecoder(r.Body).Decode(&refreshToken); err != nil {
 		h.HandleError(w, http.StatusBadRequest, err.Error())
 		return

@@ -33,7 +33,7 @@ func (h *Handler) IsAdmin(next http.Handler) http.Handler {
 			return
 		}
 
-		r.Header.Set(HeaderUserRole, userAuthInfo.Role)
+		r.Header.Set(HeaderUserRole, "admin")
 
 		next.ServeHTTP(w, r)
 	})

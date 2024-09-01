@@ -47,3 +47,16 @@ type UserAuthInfo struct {
 	UserUUID uuid.UUID `json:"user_id"`
 	Role     UserRole  `json:"role"`
 }
+
+type AdminUserInfo struct {
+	UUID     uuid.UUID      `json:"id,omitempty"`
+	Login    string         `json:"login"`
+	Name     sql.NullString `json:"name"`
+	Surname  sql.NullString `json:"surname"`
+	Role     UserRole       `json:"role"`
+	Telegram struct {
+		Username string `json:"username"`
+	} `json:"telegram"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt sql.NullTime `json:"updated_at"`
+}

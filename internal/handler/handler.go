@@ -33,6 +33,9 @@ type UseCase interface {
 	GetJWTToken() []byte
 	GetTokenByName(ctx context.Context, name string) (string, error)
 	ValidateToken(token string) (string, error)
+	UpdateUser(ctx context.Context, user dto.UpdateUserRequest, userUUID string) error
+	GetUserAuthInfoByAdmin(ctx context.Context, id string) (dto.AdminUserInfo, error)
+	ChangePassword(ctx context.Context, req dto.ChangePasswordRequest, userUUID string) error
 }
 
 type Handler struct {
@@ -52,8 +55,7 @@ func (h *Handler) HandleError(w http.ResponseWriter, code int, message string) {
 
 	w.WriteHeader(code)
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(ErrorResponse{Error: message})
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(ErrorResponse{Error: message}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

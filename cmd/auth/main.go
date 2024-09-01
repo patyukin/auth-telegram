@@ -12,11 +12,12 @@ import (
 	"auth-telegram/internal/server/router"
 	"auth-telegram/internal/telegram"
 	"auth-telegram/internal/usecase"
+	"auth-telegram/pkg/meter"
+	"auth-telegram/pkg/tracer"
 	"context"
 	"fmt"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
 	"syscall"
@@ -56,10 +57,21 @@ func main() {
 		log.Fatal().Msgf("failed creating telegram bot: %v", err)
 	}
 
+	traceProv, err := tracer.InitTracer("http://localhost:14268/api/traces", "Auth Service")
+	if err != nil {
+		log.Fatal().Msgf("init tracer, err: %v", err)
+	}
+
+	meterProv, err := meter.InitMeter(ctx, "Auth Service")
+	if err != nil {
+		log.Fatal().Msgf("init meter, err: %v", err)
+	}
+
+	srvAddress := fmt.Sprintf(":%d", cfg.HttpPort)
 	dbClient := db.New(dbConn)
 	uc := usecase.New(dbClient, chr, bot, cfg.JwtSecret)
 	h := handler.New(uc)
-	rtr := router.Init(h)
+	rtr := router.Init(h, srvAddress)
 
 	errCh := make(chan error)
 
@@ -74,7 +86,7 @@ func main() {
 	}()
 
 	go func() {
-		if err = srv.Run(fmt.Sprintf(":%d", cfg.HttpPort), cfg); err != nil {
+		if err = srv.Run(srvAddress, cfg); err != nil {
 			log.Error().Msgf("failed running http server: %v", err)
 			errCh <- err
 		}
@@ -89,23 +101,31 @@ func main() {
 
 	select {
 	case err = <-errCh:
-		logrus.Errorf("Failed to run, err: %v", err)
+		log.Error().Msgf("Failed to run, err: %v", err)
 	case res := <-sigChan:
 		if res == syscall.SIGINT || res == syscall.SIGTERM {
-			logrus.Info("Signal received")
+			log.Info().Msgf("Signal received, exiting...")
 		} else if res == syscall.SIGHUP {
-			logrus.Info("Signal received")
+			log.Info().Msgf("Signal received, sighup")
 		}
 	}
 
-	logrus.Print("Shutting Down")
+	log.Info().Msgf("Shutting Down")
 
 	if err = srv.Shutdown(ctx); err != nil {
-		logrus.Errorf("failed server shutting down: %s", err.Error())
+		log.Error().Msgf("failed server shutting down: %s", err.Error())
 	}
 
 	if err = dbClient.Close(); err != nil {
-		logrus.Errorf("failed db connection close: %s", err.Error())
+		log.Error().Msgf("failed db connection close: %s", err.Error())
+	}
+
+	if err = traceProv.Shutdown(ctx); err != nil {
+		log.Error().Msgf("Error shutting down tracer provider: %v", err)
+	}
+
+	if err = meterProv.Shutdown(ctx); err != nil {
+		log.Error().Msgf("Error shutting down meter provider: %v", err)
 	}
 
 	cj.Stop()

@@ -7,6 +7,17 @@ import (
 	"net/http"
 )
 
+// SignInHandler godoc
+// @Summary      Вход в систему
+// @Description  Аутентификация пользователя по логину и паролю в системе
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        body  body  model.SignInData  true  "Sign-in data"
+// @Success      200   {nil}  nil  "Successfully signed in, no content"
+// @Failure      400   {object}  ErrorResponse  "Invalid input data"
+// @Failure      500   {object}  ErrorResponse  "Failed to sign in"
+// @Router       /sign-in [post]
 func (h *Handler) SignInHandler(w http.ResponseWriter, r *http.Request) {
 	var signInData model.SignInData
 

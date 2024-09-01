@@ -24,7 +24,7 @@ func (s *Server) Run(addr string, cfg *config.Config) error {
 	s.httpServer = &http.Server{
 		Addr:           addr,
 		Handler:        s.h,
-		MaxHeaderBytes: 1 << 20, // 1 MB
+		MaxHeaderBytes: 1 << 20,
 		ReadTimeout:    time.Duration(cfg.ReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(cfg.WriteTimeout) * time.Second,
 	}

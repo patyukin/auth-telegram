@@ -6,6 +6,17 @@ import (
 	"net/http"
 )
 
+// GetUserInfoHandler godoc
+// @Summary      Get user information
+// @Description  Получение информации о пользователе по его UUID
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        user_id  header  string  true  "User ID (UUID)"
+// @Success      200  {object}  dto.User
+// @Failure      400  {object}  ErrorResponse  "Bad Request"
+// @Failure      500  {object}  ErrorResponse  "Internal Server Error"
+// @Router       /user/info [get]
 func (h *Handler) GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.Header.Get(HeaderUserID))
 	if err != nil {

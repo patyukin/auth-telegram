@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"auth-telegram/internal/handler/dto"
 	"auth-telegram/internal/model"
 	"auth-telegram/pkg/httperror"
 	"encoding/json"
@@ -9,6 +10,17 @@ import (
 	"net/http"
 )
 
+// ResendCodeHandler godoc
+// @Summary      Повторная отправка кода
+// @Description  Повторная отправка кода для окончания регистрации
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        body  body model.SignUpData true "Sign-up data required to resend the code"
+// @Success      200   {object}  dto.ResendCodeResponse  "Message with link to complete registration"
+// @Failure      400   {object}  ErrorResponse    "Invalid input data"
+// @Failure      500   {object}  ErrorResponse    "Internal server error"
+// @Router       /resend-code [post]
 func (h *Handler) ResendCodeHandler(w http.ResponseWriter, r *http.Request) {
 	var in model.SignUpData
 
@@ -23,25 +35,20 @@ func (h *Handler) ResendCodeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dto, err := h.uc.ResendCode(r.Context(), in)
+	signUpResponse, err := h.uc.ResendCode(r.Context(), in)
 	if err != nil {
 		log.Error().Msgf("invalid input, err: %v", err)
 		httperror.SendError(w, "invalid sign up", http.StatusBadRequest)
 		return
 	}
 
-	link := fmt.Sprintf("/start=%s", dto.Code)
+	link := fmt.Sprintf("/start=%s", signUpResponse.Code)
 	message := fmt.Sprintf("Please send this message to complete your registration: %s", link)
 
-	response := struct {
-		Message string `json:"message"`
-	}{
-		Message: message,
-	}
-
+	response := dto.ResendCodeResponse{Message: message}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	if err = json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		httperror.SendError(w, err.Error(), http.StatusInternalServerError)
 	}
 }
