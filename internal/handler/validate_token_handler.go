@@ -26,8 +26,6 @@ func (h *Handler) ValidateTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Debug().Msgf("token: %s", token.Token)
-
 	id, err := h.uc.ValidateToken(token.Token)
 	if err != nil {
 		log.Error().Msgf("failed to validate token: %s", err)

@@ -56,8 +56,6 @@ func (h *Handler) SignUpV2Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info().Msgf("sign up: %s", string(res))
-
 	_, err = w.Write(res)
 	if err != nil {
 		log.Error().Err(err).Msgf("failed to sign up, error: %v", err)

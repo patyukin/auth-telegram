@@ -8,9 +8,21 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
 	"net/http"
 	"net/http/pprof"
 )
+
+func InitRouterWithTrace(h *handler.Handler, srvAddress string) http.Handler {
+	r := Init(h, srvAddress)
+
+	tracedRouter := otelhttp.NewHandler(r, "requests",
+		otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
+	)
+
+	return tracedRouter
+}
 
 // Init godoc
 // @title Auth API
@@ -18,7 +30,7 @@ import (
 // @description Auth API for microservices
 // @host http://0.0.0.0:1234
 // @BasePath /
-func Init(h *handler.Handler, srvAddress string) http.Handler {
+func Init(h *handler.Handler, srvAddress string) *http.ServeMux {
 	prometheus.MustRegister(metrics.IncomingTraffic)
 
 	r := http.ServeMux{}
@@ -29,6 +41,14 @@ func Init(h *handler.Handler, srvAddress string) http.Handler {
 
 	// metrics
 	r.Handle("GET /metrics", promhttp.Handler())
+	r.Handle("GET /check", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		metrics.IncomingTraffic.Inc()
+		tracer := otel.Tracer("example-tracer")
+		_, span := tracer.Start(r.Context(), "HelloHandler")
+		defer span.End()
+
+		w.WriteHeader(http.StatusOK)
+	}))
 
 	// public handlers
 	r.Handle("POST /sign-up", h.CORS(h.LogUser(http.HandlerFunc(h.SignUpHandler))))
