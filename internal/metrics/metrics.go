@@ -41,3 +41,11 @@ var FailedAuthentications = prometheus.NewCounter(prometheus.CounterOpts{
 	Name: "failed_authentications",
 	Help: "Failed authentications",
 })
+
+var SignInLatencyHistogram = prometheus.NewHistogram(
+	prometheus.HistogramOpts{
+		Name:    "auth_latency_seconds",
+		Help:    "Histogram for the latency of authentication requests",
+		Buckets: prometheus.DefBuckets,
+	},
+)

@@ -9,7 +9,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel"
 	"net/http"
 	"net/http/pprof"
 )
@@ -39,6 +38,7 @@ func Init(h *handler.Handler, srvAddress string) *http.ServeMux {
 	prometheus.MustRegister(metrics.SuccessfulAuthentications)
 	prometheus.MustRegister(metrics.TotalAuthentications)
 	prometheus.MustRegister(metrics.FailedAuthentications)
+	prometheus.MustRegister(metrics.SignInLatencyHistogram)
 
 	r := http.ServeMux{}
 
@@ -48,14 +48,6 @@ func Init(h *handler.Handler, srvAddress string) *http.ServeMux {
 
 	// metrics
 	r.Handle("GET /metrics", promhttp.Handler())
-	r.Handle("GET /check", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		metrics.IncomingTraffic.Inc()
-		tracer := otel.Tracer("example-tracer")
-		_, span := tracer.Start(r.Context(), "HelloHandler")
-		defer span.End()
-
-		w.WriteHeader(http.StatusOK)
-	}))
 
 	// public handlers
 	r.Handle("POST /sign-up", h.CORS(h.LogUser(http.HandlerFunc(h.SignUpHandler))))
