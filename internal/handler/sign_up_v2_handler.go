@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"auth-telegram/internal/metrics"
 	"auth-telegram/internal/model"
 	"auth-telegram/pkg/httperror"
 	"encoding/json"
@@ -62,4 +63,6 @@ func (h *Handler) SignUpV2Handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	metrics.SignUpV2RegisterTraffic.Inc()
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 	"net"
 	"strconv"
 	"time"
@@ -23,6 +24,7 @@ func New(ctx context.Context, cfg *config.Config) (*Cacher, error) {
 		return nil, fmt.Errorf("failed to connect to redis: %w", err)
 	}
 
+	log.Info().Msg("connected to redis")
 	return &Cacher{client: c}, nil
 }
 

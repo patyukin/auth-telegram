@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"auth-telegram/internal/metrics"
 	"encoding/json"
 	"github.com/google/uuid"
 	"net/http"
@@ -37,9 +38,10 @@ func (h *Handler) GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(userInfo)
-	if err != nil {
+	if err = json.NewEncoder(w).Encode(userInfo); err != nil {
 		h.HandleError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	metrics.GetInfoUserTraffic.Inc()
 }

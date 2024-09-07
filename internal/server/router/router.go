@@ -32,6 +32,13 @@ func InitRouterWithTrace(h *handler.Handler, srvAddress string) http.Handler {
 // @BasePath /
 func Init(h *handler.Handler, srvAddress string) *http.ServeMux {
 	prometheus.MustRegister(metrics.IncomingTraffic)
+	prometheus.MustRegister(metrics.SignUpV1RegisterTraffic)
+	prometheus.MustRegister(metrics.SignUpV2RegisterTraffic)
+	prometheus.MustRegister(metrics.SignUpV3RegisterTraffic)
+	prometheus.MustRegister(metrics.GetInfoUserTraffic)
+	prometheus.MustRegister(metrics.SuccessfulAuthentications)
+	prometheus.MustRegister(metrics.TotalAuthentications)
+	prometheus.MustRegister(metrics.FailedAuthentications)
 
 	r := http.ServeMux{}
 
