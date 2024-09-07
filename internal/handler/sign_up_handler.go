@@ -2,6 +2,7 @@ package handler
 
 import (
 	"auth-telegram/internal/handler/dto"
+	"auth-telegram/internal/metrics"
 	"auth-telegram/internal/model"
 	"auth-telegram/pkg/httperror"
 	"encoding/json"
@@ -53,4 +54,6 @@ func (h *Handler) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	if err = json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
+	metrics.SignUpV1RegisterTraffic.Inc()
 }

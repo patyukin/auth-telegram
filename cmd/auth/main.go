@@ -57,7 +57,7 @@ func main() {
 		log.Fatal().Msgf("failed creating telegram bot: %v", err)
 	}
 
-	traceProv, err := tracer.InitTracer("http://localhost:14268/api/traces", "Auth Service")
+	traceProv, err := tracer.InitTracer("http://tracing-jaeger-1:14268/api/traces", "Auth Service")
 	if err != nil {
 		log.Fatal().Msgf("init tracer, err: %v", err)
 	}
@@ -71,7 +71,7 @@ func main() {
 	dbClient := db.New(dbConn)
 	uc := usecase.New(dbClient, chr, bot, cfg.JwtSecret)
 	h := handler.New(uc)
-	rtr := router.Init(h, srvAddress)
+	rtr := router.InitRouterWithTrace(h, srvAddress)
 
 	errCh := make(chan error)
 

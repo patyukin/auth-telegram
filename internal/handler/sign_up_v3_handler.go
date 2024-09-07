@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"auth-telegram/internal/metrics"
 	"auth-telegram/internal/model"
 	"auth-telegram/pkg/httperror"
 	"encoding/json"
@@ -33,7 +34,6 @@ func (h *Handler) SignUpV3Handler(w http.ResponseWriter, r *http.Request) {
 	parts := strings.SplitN(tokenWithService, ":", 2)
 
 	if len(parts) != 2 {
-		log.Error().Msgf("failed token: %s", tokenWithService)
 		httperror.SendError(w, "invalid sign up", http.StatusBadRequest)
 		return
 	}
@@ -48,14 +48,11 @@ func (h *Handler) SignUpV3Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info().Msgf("service: %s, token: %s, tokenFromDB: %s", service, token, tokenFromDB)
 	if token != tokenFromDB {
 		log.Error().Err(err).Msgf("failed to sign up tokens do not match, error: %v", err)
 		httperror.SendError(w, "invalid sign up", http.StatusBadRequest)
 		return
 	}
-
-	log.Debug().Msgf("data in: %v", in)
 
 	result, err := h.uc.SignUpV2(r.Context(), in)
 	if err != nil {
@@ -73,12 +70,12 @@ func (h *Handler) SignUpV3Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info().Msgf("sign up: %s", string(res))
-
 	_, err = w.Write(res)
 	if err != nil {
 		log.Error().Err(err).Msgf("failed to sign up, error: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	metrics.SignUpV3RegisterTraffic.Inc()
 }

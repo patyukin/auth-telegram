@@ -8,9 +8,20 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"net/http"
 	"net/http/pprof"
 )
+
+func InitRouterWithTrace(h *handler.Handler, srvAddress string) http.Handler {
+	r := Init(h, srvAddress)
+
+	tracedRouter := otelhttp.NewHandler(r, "requests",
+		otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
+	)
+
+	return tracedRouter
+}
 
 // Init godoc
 // @title Auth API
@@ -18,8 +29,16 @@ import (
 // @description Auth API for microservices
 // @host http://0.0.0.0:1234
 // @BasePath /
-func Init(h *handler.Handler, srvAddress string) http.Handler {
+func Init(h *handler.Handler, srvAddress string) *http.ServeMux {
 	prometheus.MustRegister(metrics.IncomingTraffic)
+	prometheus.MustRegister(metrics.SignUpV1RegisterTraffic)
+	prometheus.MustRegister(metrics.SignUpV2RegisterTraffic)
+	prometheus.MustRegister(metrics.SignUpV3RegisterTraffic)
+	prometheus.MustRegister(metrics.GetInfoUserTraffic)
+	prometheus.MustRegister(metrics.SuccessfulAuthentications)
+	prometheus.MustRegister(metrics.TotalAuthentications)
+	prometheus.MustRegister(metrics.FailedAuthentications)
+	prometheus.MustRegister(metrics.SignInLatencyHistogram)
 
 	r := http.ServeMux{}
 
